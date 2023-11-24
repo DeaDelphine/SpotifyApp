@@ -1,39 +1,23 @@
-const Playlist = require("../models/PlaylistModel");
+const Playlist = require("../models/playlistModel");
 
-const allPlaylists = async (req, res) => {
+const addPlaylist = async (req, res) => {
   try {
-    let playlists = await Playlist.find().populate('audioPist', 'userPlay');
-    res.send(playlists);
-  } catch (error) {
-    console.error(error);
-  }
-};
-const postPlaylist = async (req, res) => {
-  const { name, audioPist, userPlay } = req.body;
-  try {
-    let newPlaylist = new Playlist({ name, audioPist, userPlay });
+    const newPlaylist = new Playlist(req.body);
     await newPlaylist.save();
-    res.send(newPlaylist);
-  } catch (err) {
-    console.error(err);
+    res.json(newPlaylist);
+  } catch (error) {
+    res.json({ message: error.message });
   }
 };
-const putPlaylist = async (req, res) => {
-  const { Playlistname, email } = req.body;
+const userPlaylist = async (req, res) => {
   try {
-    let Playlist = Playlist.findOneAndUpdate(
-      { _id: req.params.id },
-      { Playlistname, email },
-      { new: true }
-    );
-    res.send({ message: "Playlist successfully updated", Playlist });
-  } catch (err) {
-    console.error(err);
+    const playlists = await Playlist.find({
+      user_id: req.params.id_user,
+    }).populate("Pistes");
+    res.json(playlists);
+  } catch (error) {
+    res.json({ message: error.message });
   }
-};
-const removePlaylist = async (req, res) => {
-  await Playlist.findOneAndDelete(req.params.id);
-  res.send({ message: "Playlist deleted successfully" });
 };
 
-module.exports = { allPlaylists, postPlaylist, putPlaylist, removePlaylist };
+module.exports = { addPlaylist, userPlaylist };

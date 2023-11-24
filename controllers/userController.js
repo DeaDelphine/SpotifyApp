@@ -1,39 +1,21 @@
 const User = require("../models/userModel");
 
-const allUsers = async (req, res) => {
+const create = async (req, res) => {
   try {
-    let users = await User.find();
-    res.send(users);
-  } catch (error) {
-    console.error(error);
-  }
-};
-const postUser = async (req, res) => {
-  const { name, email } = req.body;
-  try {
-    let newUser = new User({ name, email });
+    const newUser = new User(req.body);
     await newUser.save();
-    res.send(newUser);
-  } catch (err) {
-    console.error(err);
+    res.json(user);
+  } catch (error) {
+    res.json({ mesage: error.mesage });
   }
 };
-const putUser = async (req, res) => {
-  const { name, email } = req.body;
+const getUsers = async (req, res) => {
   try {
-    let user = User.findOneAndUpdate(
-      { _id: req.params.id },
-      { name, email },
-      { new: true }
-    );
-    res.send({ message: "User successfully updated", user });
-  } catch (err) {
-    console.error(err);
+    const users = await User.find();
+    res.json(users);
+  } catch (error) {
+    res.json({ message: error.message });
   }
-};
-const removeUser = async (req, res) => {
-  await User.findOneAndDelete(req.params.id);
-  res.send({ message: "User deleted successfully" });
 };
 
-module.exports = { allUsers, postUser, putUser, removeUser };
+module.exports = { create, getUsers };
